@@ -28,6 +28,10 @@ function getQuantityElements(heightElement) {
 
 function startGame(){
     start.classList.add('hide');
+    gameArea.innerHTML = '';
+    car.style.left = '125px';
+    car.style.top = 'auto';
+    car.style.bottom = '10px';
 
     for (let i = 0; i < getQuantityElements(100); i++) {
         const line = document.createElement('div');
@@ -48,6 +52,7 @@ function startGame(){
 
     }
 
+    settings.score = 0;
     settings.start = true;
     requestAnimationFrame(playGame);
     gameArea.appendChild(car);
@@ -58,6 +63,8 @@ function startGame(){
 
 function playGame(){
     if (settings.start){
+        settings.score += settings.speed;
+        score.textContent = 'SCORE: ' + settings.score;
         moveRoad();
         moveEnemy();
         if(keys.ArrowLeft && settings.x > 0){
@@ -110,6 +117,17 @@ function moveRoad() {
 function moveEnemy() {
     let enemy = document.querySelectorAll('.enemy');
     enemy.forEach(function(item){
+        let carRect = car.getBoundingClientRect();
+        let enemyRect = item.getBoundingClientRect();
+
+        if(carRect.top <= enemyRect.bottom &&
+            carRect.right >= enemyRect.left &&
+            carRect.left <= enemyRect.right &&
+            carRect.bottom >= enemyRect.top) {
+                settings.start = false;
+                console.warn('ДТП');
+                start.classList.remove('hide');
+        }
         item.y += settings.speed-1;
         item.style.top = item.y + 'px';
         if(item.y >= document.documentElement.clientHeight){
